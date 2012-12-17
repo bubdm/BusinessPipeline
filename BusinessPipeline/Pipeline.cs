@@ -1,7 +1,9 @@
 ﻿namespace BusinessPipeline
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
 
     public class Pipeline
     {
@@ -16,14 +18,17 @@
             }
         }
 
-        public virtual IEnumerable<StepExecutionResult> Execute(PipelineContext context)
+        public virtual PipelineExecutionResult Execute(PipelineContext context)
         {
-            foreach (var step in _steps)
-            {
-                var result = step.Execute(context);
-                //if (result.Halt)
-            }
-            return new List<StepExecutionResult>();
+            List<StepExecutionResult> stepExecutionResults = new List<StepExecutionResult>();
+            StepExecutionResult result = null;
+            _steps.TakeWhile(x => 
+                {
+                    result = x.Execute(context);
+                    stepExecutionResults.Add(result);
+                    return result.Success;
+                });
+            return new PipelineExecutionResult(stepExecutionResults);
         }
     }
 
@@ -41,28 +46,27 @@
     }
 
     public abstract class PipelineStep
+    {     
+        public abstract StepExecutionResult Execute(PipelineContext context);
+    }
+
+    public class PipelineExecutionResult
     {
-        private readonly bool _haltOnError;
-        private PipelineStep _nextStep;
+        public ReadOnlyCollection<StepExecutionResult> StepResults { get; private set; }
 
-        protected PipelineStep(bool haltOnError)
+        public PipelineExecutionResult(IList<StepExecutionResult> stepExecutionResults)
         {
-            _haltOnError = haltOnError;
-        }
-
-        public StepExecutionResult Execute(PipelineContext context)
-        {
-            throw new NotImplementedException();
+            StepResults = new ReadOnlyCollection<StepExecutionResult>(stepExecutionResults);
         }
     }
 
     public class StepExecutionResult
     {
-        public bool Halt { get; private set; }
+        public bool Success { get; private set; }
 
-        public StepExecutionResult(bool halt)
+        public StepExecutionResult(PipelineStep step, bool success)
         {
-            Halt = halt;
+            Success = success;
         }
     }
 }
