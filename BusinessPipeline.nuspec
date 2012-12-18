@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>BusinessPipeline</id>
+        <version>1.0.0</version>
+        <title>A simple pipeline infrastructure</title>
+        <authors>Lars Wilhelmsen</authors>
+        <owners />
+        <projectUrl>http://github.com/larsw/BusinessPipeline/</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>My package description.</description>
+    </metadata>
+    <files />
+</package>
