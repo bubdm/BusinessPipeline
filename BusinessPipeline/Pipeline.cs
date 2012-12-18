@@ -1,72 +1,49 @@
 ﻿namespace BusinessPipeline
 {
     using System;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
 
     public class Pipeline
     {
-        private readonly List<PipelineStep> _steps;
+        private readonly List<PipelineStep> _steps; 
+
+        public IReadOnlyCollection<PipelineStep> Steps
+        {
+            get { return new ReadOnlyCollection<PipelineStep>(_steps); }
+        }
 
         public Pipeline(params PipelineStep[] pipelineSteps)
         {
             _steps = new List<PipelineStep>(pipelineSteps);
-            if (_steps.Contains(null))
+            if (Steps.Contains(null))
             {
                 throw new InvalidOperationException("The pipeline cannot make use of null steps.");
             }
         }
 
+        public void AddStep(PipelineStep pipelineStep)
+        {
+            if (pipelineStep == null) throw new ArgumentNullException("pipelineStep");
+
+            _steps.Add(pipelineStep);
+        }
+
         public virtual PipelineExecutionResult Execute(PipelineContext context)
         {
-            List<StepExecutionResult> stepExecutionResults = new List<StepExecutionResult>();
-            StepExecutionResult result = null;
-            _steps.TakeWhile(x => 
+            if (context == null) throw new ArgumentNullException("context");
+
+            var stepExecutionResults = new List<StepExecutionResult>();
+            foreach (var result in Steps.Select(step => step.Execute(context)))
+            {
+                stepExecutionResults.Add(result);
+                if (false == result.Success)
                 {
-                    result = x.Execute(context);
-                    stepExecutionResults.Add(result);
-                    return result.Success;
-                });
+                    break;
+                }
+            }
             return new PipelineExecutionResult(stepExecutionResults);
-        }
-    }
-
-    public class PipelineContext
-    {
-        protected readonly Dictionary<string, object> Properties = new Dictionary<string, object>();
-
-        public void SetProperty(string name, object property)
-        {
-            if (name == null) throw new ArgumentNullException("name");
-            if (property == null) throw new ArgumentNullException("property");
-
-            Properties[name] = property;
-        }
-    }
-
-    public abstract class PipelineStep
-    {     
-        public abstract StepExecutionResult Execute(PipelineContext context);
-    }
-
-    public class PipelineExecutionResult
-    {
-        public ReadOnlyCollection<StepExecutionResult> StepResults { get; private set; }
-
-        public PipelineExecutionResult(IList<StepExecutionResult> stepExecutionResults)
-        {
-            StepResults = new ReadOnlyCollection<StepExecutionResult>(stepExecutionResults);
-        }
-    }
-
-    public class StepExecutionResult
-    {
-        public bool Success { get; private set; }
-
-        public StepExecutionResult(PipelineStep step, bool success)
-        {
-            Success = success;
         }
     }
 }

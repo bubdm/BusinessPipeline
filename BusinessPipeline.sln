@@ -3,13 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessPipeline", "BusinessPipeline\BusinessPipeline.csproj", "{FD7B5A78-C909-4830-BF78-5F86DF1B18F7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{98F46EF2-5911-4E92-BA25-0DC10C9F0C69}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessPipeline.Tests", "BusinessPipeline.Tests\BusinessPipeline.Tests.csproj", "{E5D72133-8027-4B6E-87F4-C89F51CE03A0}"
 EndProject
 Global
